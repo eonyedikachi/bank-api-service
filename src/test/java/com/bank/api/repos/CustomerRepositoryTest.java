@@ -23,7 +23,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void shouldReturnTrueIfExistsByEmail() {
+    void shouldReturnTrueIfCustomerExistsByEmail() {
         //given
         String email = "john_james@gmail.com";
 
@@ -43,5 +43,28 @@ class CustomerRepositoryTest {
 
         //then
         assertThat(expected).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseIfCustomerDoesNotExistsByEmail() {
+        //given
+        String email = "chuksbuka@gmail.com";
+
+        CustomerEntity customer = new CustomerEntity();
+        customer.setId(2L);
+        customer.setName( "Ebuka Chuks");
+        customer.setEmail("bukachuks@gmail.com");
+        customer.setPhoneNumber("2341234567890");
+        customer.setAddress("Aba, Nigeria");
+        customer.setDateOfBirth(LocalDate.of(1974, 10, 11));
+        customer.setDateCreated(LocalDateTime.now());
+
+        customerRepoTest.save(customer);
+
+        //when
+        boolean expected = customerRepoTest.existsByEmail(email);
+
+        //then
+        assertThat(expected).isFalse();
     }
 }
