@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +48,31 @@ class AccountRepositoryTest {
 
         //then
         assertThat(expected).isEqualTo(account);
+
+    }
+
+    @Test
+    @DisplayName("findByAccountNumber should return not account record when invalid Account Number is passed")
+    void shouldNotReturnAccountIfAccountNumberIsInvalid() {
+        //given
+        String accountNumber = "1234567890";
+
+        AccountEntity account = new AccountEntity();
+
+        account.setId(2L);
+        account.setAccountNumber("1987654321");
+        account.setAccountPin("48rfubf984bnf uhdfbnsdf jnc jnk");
+        account.setAccountType(AccountType.SAVINGS);
+        account.setCurrentBalance(new BigDecimal("12000"));
+        account.setDateCreated(LocalDateTime.now());
+
+        accountRepo.save(account);
+
+        //when
+        boolean expected = accountRepo.findByAccountNumber(accountNumber).isPresent();
+
+        //then
+        assertThat(expected).isFalse();
 
     }
 
