@@ -2,6 +2,7 @@ package com.bank.api.repos;
 
 import com.bank.api.entities.CustomerEntity;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -23,6 +24,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    @DisplayName("existsByEmail should return true when valid email is passed")
     void shouldReturnTrueIfCustomerExistsByEmail() {
         //given
         String email = "john_james@gmail.com";
@@ -46,6 +48,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    @DisplayName("existsByEmail should return false when invalid email is passed")
     void shouldReturnFalseIfCustomerDoesNotExistsByEmail() {
         //given
         String email = "chuksbuka@gmail.com";
