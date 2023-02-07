@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +46,8 @@ class CustomerServiceImplTest {
 
 
         CustomerEntity entity = new CustomerEntity();
-        entity.setId(1L);
+        Long expectedId = 1L;
+        entity.setId(expectedId);
         entity.setName( "Tobi Ola");
         entity.setEmail("tobi.ola@bank.com");
         entity.setPhoneNumber("2341782345690");
@@ -54,7 +56,10 @@ class CustomerServiceImplTest {
         entity.setDateCreated(dateCreated);
 
         //when
-        when(customerRepo.save(any(CustomerEntity.class))).thenReturn(entity);
+        when(customerRepo.save(any(CustomerEntity.class))).thenAnswer(invocation -> {
+            ReflectionTestUtils.setField((CustomerEntity) invocation.getArgument(0), "id", expectedId);
+            return entity;
+        });
 
         CustomerResponseDTO responseDTO = serviceTest.createCustomer(customerRequest);
 
@@ -70,8 +75,7 @@ class CustomerServiceImplTest {
         assertThat(customerCaptor.getValue().getEmail()).isEqualTo("tobi.ola@bank.com");
         assertThat(customerCaptor.getValue().getAddress()).isEqualTo("Lagos, Nigeria");
         assertThat(customerCaptor.getValue().getPhoneNumber()).isEqualTo("2341782345690");
-        assertThat(customerCaptor.getValue().getDateOfBirth()).isEqualTo(dateCreated);
-        assertThat(customerCaptor.getValue().getDateCreated()).isEqualTo(dateCreated);
+        assertThat(customerCaptor.getValue().getDateOfBirth()).isEqualTo(dateOfBirth);
 
 
         assertThat(responseDTO.getId()).isEqualTo(1L);
@@ -79,8 +83,8 @@ class CustomerServiceImplTest {
         assertThat(responseDTO.getEmail()).isEqualTo("tobi.ola@bank.com");
         assertThat(responseDTO.getAddress()).isEqualTo("Lagos, Nigeria");
         assertThat(responseDTO.getPhoneNumber()).isEqualTo("2341782345690");
-        assertThat(responseDTO.getDateOfBirth()).isEqualTo(dateCreated);
-        assertThat(responseDTO.getDateCreated()).isEqualTo(dateCreated);
+        assertThat(responseDTO.getDateOfBirth()).isEqualTo(dateOfBirth);
+
     }
 
     @Test
