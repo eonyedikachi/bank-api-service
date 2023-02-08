@@ -1,10 +1,12 @@
 package com.bank.api.service.impl;
 
 import com.bank.api.entities.CustomerEntity;
+import com.bank.api.exceptions.InvalidValueException;
 import com.bank.api.pojos.CustomerRequestDTO;
 import com.bank.api.pojos.CustomerResponseDTO;
 import com.bank.api.repos.CustomerRepository;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,9 +18,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 
@@ -32,7 +36,8 @@ class CustomerServiceImplTest {
     private CustomerServiceImpl serviceTest;
 
     @Test
-    void createCustomer() {
+    @DisplayName("createCustomer should create new customer record and return customer response object")
+    void shouldCreateNewCustomer() {
         //given
         LocalDateTime dateCreated = LocalDateTime.now();
         LocalDate dateOfBirth = LocalDate.of(1974, 12, 10);
@@ -84,6 +89,32 @@ class CustomerServiceImplTest {
         assertThat(responseDTO.getAddress()).isEqualTo("Lagos, Nigeria");
         assertThat(responseDTO.getPhoneNumber()).isEqualTo("2341782345690");
         assertThat(responseDTO.getDateOfBirth()).isEqualTo(dateOfBirth);
+
+    }
+
+    @Test
+    @DisplayName("createCustomer should throw exception if customer email already exists")
+    void shouldThrowExceptionIfCustomerEmailAlreadyExists() {
+        //given
+
+        CustomerRequestDTO customerRequest = new CustomerRequestDTO();
+        customerRequest.setName( "Sly Black");
+        customerRequest.setEmail("sly.black@bank.com");
+        customerRequest.setPhoneNumber("3417456238290");
+        customerRequest.setAddress("PH, Nigeria");
+        customerRequest.setDateOfBirth(LocalDate.of(1981, 12, 05));
+
+        given(customerRepo.existsByEmail(customerRequest.getEmail()))
+                .willReturn(true);
+
+        //when
+
+        // then
+        assertThatThrownBy(() -> serviceTest.createCustomer(customerRequest))
+                .isInstanceOf(InvalidValueException.class)
+                .hasMessageContaining("Customer Already Exists");
+
+        verify(customerRepo, never()).save(any());
 
     }
 
