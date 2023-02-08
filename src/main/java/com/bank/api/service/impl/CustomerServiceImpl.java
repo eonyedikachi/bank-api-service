@@ -1,5 +1,6 @@
 package com.bank.api.service.impl;
 
+import com.bank.api.exceptions.InvalidValueException;
 import com.bank.api.pojos.CustomerRequestDTO;
 import com.bank.api.pojos.CustomerResponseDTO;
 import com.bank.api.pojos.CustomerUpdateRequestDTO;
@@ -29,6 +30,11 @@ public class CustomerServiceImpl implements CustomerServiceInf {
     @Override
     public CustomerResponseDTO createCustomer(CustomerRequestDTO customerRequestDTO) {
         log.info("About to create new customer record");
+
+        boolean exists = customerRepository.existsByEmail(customerRequestDTO.getEmail());
+
+        if (exists)
+            throw new InvalidValueException("Customer already exists");
 
         CustomerEntity customerEntity = mapToEntity(customerRequestDTO);
         customerEntity.setDateCreated(LocalDateTime.now());

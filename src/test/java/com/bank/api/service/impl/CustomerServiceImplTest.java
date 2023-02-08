@@ -112,7 +112,7 @@ class CustomerServiceImplTest {
         // then
         assertThatThrownBy(() -> serviceTest.createCustomer(customerRequest))
                 .isInstanceOf(InvalidValueException.class)
-                .hasMessageContaining("Customer Already Exists");
+                .hasMessageContaining("Customer already exists");
 
         verify(customerRepo, never()).save(any());
 
